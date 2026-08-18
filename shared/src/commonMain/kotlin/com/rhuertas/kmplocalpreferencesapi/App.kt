@@ -38,13 +38,14 @@ import kmplocalpreferencesapi.shared.generated.resources.compose_multiplatform
 @Preview
 fun App(
     optionsStore: OptionsStore? = null,
+    onOptionsLoaded: (Options) -> Unit = {}
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "progress_bar_transition")
     val progress by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1800, easing = LinearEasing),
+            animation = tween(durationMillis = 100, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "progress_value"
@@ -58,6 +59,7 @@ fun App(
     LaunchedEffect(options, didNotifyOptionsLoaded) {
         val loadedOptions = options ?: return@LaunchedEffect
         if (!didNotifyOptionsLoaded) {
+            onOptionsLoaded(loadedOptions)
             didNotifyOptionsLoaded = true
         }
     }
@@ -77,20 +79,27 @@ fun App(
                 Text("Click me!")
             }
             Text(
-                "Saved options: color=${currentOptions.color}, mode=${currentOptions.mode}, dark=${currentOptions.dark_mode}",
+                "Saved options: color=${currentOptions.color.name}, mode=${currentOptions.mode}, dark=${currentOptions.dark_mode}",
                 modifier = Modifier.visible(didNotifyOptionsLoaded)
             )
             Button(
                 enabled = options != null,
                 onClick = {
                     options?.let { loadedOptions ->
-                        coroutineScope.launch {
-                            resolvedStore.saveOptions(
-                                loadedOptions.copy(
-                                    color = if (loadedOptions.color == "blue") "green" else "blue",
-                                    mode = loadedOptions.mode + 1,
-                                    dark_mode = !loadedOptions.dark_mode
-                                )
+                        run {
+                            val newOptions = loadedOptions.copy(
+                                color = when (loadedOptions.color) {
+                                    OptionColor.WHITE -> OptionColor.GREEN
+                                    OptionColor.GREEN -> OptionColor.RED
+                                    OptionColor.RED -> OptionColor.WHITE
+                                },
+                                mode = loadedOptions.mode + 1,
+                                dark_mode = !loadedOptions.dark_mode
+                            )
+                            saveOptionsToStoreAsync(
+                                options = newOptions,
+                                store = resolvedStore,
+                                coroutineScope = coroutineScope
                             )
                         }
                     }
@@ -99,7 +108,9 @@ fun App(
             ) {
                 Text("Save options")
             }
-            AnimatedVisibility(showContent) {
+            AnimatedVisibility(
+                visible = showContent,
+            ) {
                 val greeting = remember { Greeting().greet() }
                 Column(
                     modifier = Modifier.fillMaxWidth(),
