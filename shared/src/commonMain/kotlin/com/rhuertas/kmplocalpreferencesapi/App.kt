@@ -1,6 +1,10 @@
 package com.rhuertas.kmplocalpreferencesapi
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -33,6 +37,9 @@ import kotlinx.coroutines.launch
 
 import kmplocalpreferencesapi.shared.generated.resources.Res
 import kmplocalpreferencesapi.shared.generated.resources.compose_multiplatform
+
+private const val logoEnterDurationMillis = 100
+private const val logoExitDurationMillis = 100
 
 @Composable
 @Preview
@@ -110,13 +117,27 @@ fun App(
             }
             AnimatedVisibility(
                 visible = showContent,
+                enter = fadeIn(
+                    animationSpec = tween(durationMillis = logoEnterDurationMillis)
+                ) + scaleIn(
+                    animationSpec = tween(
+                        durationMillis = logoEnterDurationMillis,
+                    )
+                ),
+                exit = fadeOut(
+                    animationSpec = tween(durationMillis = logoExitDurationMillis)
+                ) + scaleOut(
+                    animationSpec = tween(
+                        durationMillis = logoExitDurationMillis,
+                    )
+                )
             ) {
                 val greeting = remember { Greeting().greet() }
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
+                    Image(painterResource(Res.drawable.compose_multiplatform), contentDescription = "Logo")
                     Text("Compose: $greeting")
                 }
             }
