@@ -18,10 +18,20 @@ import org.jetbrains.compose.resources.painterResource
 
 import kmplocalpreferencesapi.shared.generated.resources.Res
 import kmplocalpreferencesapi.shared.generated.resources.compose_multiplatform
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 
+data class Options (
+    val color: String,
+    val mode: Int,
+    val dark_mode: Boolean
+)
 @Composable
 @Preview
-fun App() {
+fun App(
+    prefs : DataStore<Preferences>
+) {
+
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(

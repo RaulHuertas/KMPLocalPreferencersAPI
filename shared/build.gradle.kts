@@ -64,6 +64,7 @@ kotlin {
             dependencies {
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.compose.uiTooling)
+                api(libs.androidx.datastore.preferences)
             }
         }
         commonMain.dependencies {
