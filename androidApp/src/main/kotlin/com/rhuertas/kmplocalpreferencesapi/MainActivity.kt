@@ -1,6 +1,7 @@
 package com.rhuertas.kmplocalpreferencesapi
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,9 +17,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             App(
-                prefs = remember{
-                    createDataStore(this)
-                }
+                optionsStore = remember { OptionsDataStore(createDataStore(this)) },
+                onOptionsLoaded = { options -> Log.d("MainActivity", "Options loaded: $options") }
             )
         }
     }
@@ -29,6 +29,6 @@ class MainActivity : ComponentActivity() {
 fun AppAndroidPreview() {
     val context = LocalContext.current
     App(
-        prefs = remember(context) { createDataStore(context) }
+        optionsStore = remember(context) { OptionsDataStore(createDataStore(context)) }
     )
 }
