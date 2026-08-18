@@ -18,7 +18,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             App(
                 optionsStore = remember { OptionsDataStore(createDataStore(this)) },
-                onOptionsLoaded = { options -> Log.d("MainActivity", "Options loaded: $options") }
             )
         }
     }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.visible
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +38,6 @@ import kmplocalpreferencesapi.shared.generated.resources.compose_multiplatform
 @Preview
 fun App(
     optionsStore: OptionsStore? = null,
-    onOptionsLoaded: (Options) -> Unit = {}
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "progress_bar_transition")
     val progress by infiniteTransition.animateFloat(
@@ -58,7 +58,6 @@ fun App(
     LaunchedEffect(options, didNotifyOptionsLoaded) {
         val loadedOptions = options ?: return@LaunchedEffect
         if (!didNotifyOptionsLoaded) {
-            onOptionsLoaded(loadedOptions)
             didNotifyOptionsLoaded = true
         }
     }
@@ -77,7 +76,10 @@ fun App(
             Button(onClick = { showContent = !showContent }) {
                 Text("Click me!")
             }
-            Text("Saved options: color=${currentOptions.color}, mode=${currentOptions.mode}, dark=${currentOptions.dark_mode}")
+            Text(
+                "Saved options: color=${currentOptions.color}, mode=${currentOptions.mode}, dark=${currentOptions.dark_mode}",
+                modifier = Modifier.visible(didNotifyOptionsLoaded)
+            )
             Button(
                 enabled = options != null,
                 onClick = {
@@ -92,7 +94,8 @@ fun App(
                             )
                         }
                     }
-                }
+                },
+                modifier = Modifier.visible(didNotifyOptionsLoaded)
             ) {
                 Text("Save options")
             }
@@ -110,7 +113,9 @@ fun App(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(bottom = 16.dp)
+                    .visible(!didNotifyOptionsLoaded)
+                ,
                 contentAlignment = Alignment.BottomCenter
             ) {
                 LinearProgressIndicator(
@@ -118,7 +123,9 @@ fun App(
                     modifier = Modifier
                         .fillMaxWidth(1.0f)
                 )
+                Text("Loading options...")
             }
+
         }
     }
 }
